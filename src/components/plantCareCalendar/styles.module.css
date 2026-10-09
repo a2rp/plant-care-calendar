@@ -1,0 +1,87 @@
+.plantCareCalendar {
+    .gardenHeader { display: flex; align-items: center; justify-content: space-between; gap: 28px; padding: 21px 0 25px; }
+    .label { color: var(--accent); font-size: 10px; font-weight: 800; letter-spacing: .16em; }
+    .gardenHeader h1 { margin-top: 9px; font-family: Georgia, serif; font-size: clamp(44px, 5.2vw, 66px); font-weight: 450; line-height: .96; letter-spacing: -.045em; }
+    .gardenHeader h1 span { color: #6f8e78; font-style: italic; }
+    .description { margin-top: 13px; color: var(--muted); font-size: 13px; }
+    .waterSummary { position: relative; display: flex; min-width: 260px; align-items: center; gap: 13px; padding: 20px; border: 1px solid #cddfcd; border-radius: 17px; background: #dceadd; }
+    .waterDrop { width: 48px; height: 48px; display: grid; place-items: center; border-radius: 50% 50% 50% 12px; color: #fff; background: #47765c; font-size: 20px; }
+    .waterSummary div { display: grid; line-height: 1.2; }
+    .waterSummary strong { font-family: Georgia, serif; font-size: 29px; }
+    .waterSummary div span { color: #597263; font-size: 11px; }
+    .summaryDate { position: absolute; top: 13px; right: 14px; color: #66816e; font-size: 8px; font-weight: 800; letter-spacing: .13em; }
+    .weatherStrip { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; padding: 11px 15px; border: 1px solid #e1e8d5; border-radius: 10px; background: #f5f5e9; font-size: 11px; }
+    .weatherStrip svg { flex: 0 0 17px; color: #bb9348; }
+    .weatherStrip p { flex: 0 0 auto; font-weight: 750; }
+    .weatherStrip span { color: var(--muted); }
+    .plantSection { padding: 22px; border: 1px solid var(--line); border-radius: 19px; background: var(--card); }
+    .sectionHeading { display: flex; align-items: end; justify-content: space-between; gap: 18px; }
+    .sectionHeading h2 { font-family: Georgia, serif; font-size: 25px; font-weight: 500; }
+    .sectionHeading p { color: var(--muted); font-size: 11px; }
+    .searchBox { display: flex; width: 230px; align-items: center; gap: 7px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; color: var(--muted); background: var(--paper); font-size: 10px; }
+    .searchBox span { display: block; flex: 0 0 auto; white-space: nowrap; }
+    .searchBox input { width: 100%; min-width: 0; border: 0; outline: 0; background: transparent; }
+    .toolbar { display: flex; gap: 6px; margin: 16px 0; }
+    .toolbar button { display: flex; align-items: center; gap: 7px; min-height: 32px; padding: 0 11px; border: 1px solid var(--line); border-radius: 99px; color: var(--muted); background: transparent; font-size: 10px; }
+    .toolbar button span { font-size: 9px; }
+    .toolbar .activeTab { border-color: #47765c; color: #fff; background: #47765c; }
+    .plantGrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+    .plantCard { overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: #fff; }
+    .plantArt { position: relative; display: grid; height: 116px; place-items: center; overflow: hidden; background: radial-gradient(ellipse at 50% 0, #d7e7d4 0 30%, transparent 68%), #eef3e8; }
+    .plantArt1 { background: radial-gradient(ellipse at 28% 5%, #ead9bd 0 18%, transparent 62%), #f0eddf; }
+    .plantArt2 { background: radial-gradient(ellipse at 70% 0, #ceddcb 0 25%, transparent 65%), #e8efdf; }
+    .plantArt3 { background: radial-gradient(ellipse at 40% 0, #d2e2db 0 27%, transparent 66%), #edf0e7; }
+    .pot { position: absolute; bottom: 8px; left: calc(50% - 22px); width: 44px; height: 35px; border-radius: 4px 4px 12px 12px; background: #c78d6d; clip-path: polygon(0 0, 100% 0, 84% 100%, 16% 100%); }
+    .plantArt i, .plantArt b { position: absolute; bottom: 36px; left: calc(50% - 3px); width: 6px; height: 58px; border-radius: 99px; background: #467558; transform: rotate(-8deg); }
+    .plantArt i::before, .plantArt b::before { position: absolute; top: 8px; left: -24px; width: 31px; height: 15px; border-radius: 100% 0 100% 0; background: #5c916b; content: ""; transform: rotate(-25deg); }
+    .plantArt b { height: 44px; left: calc(50% + 10px); transform: rotate(23deg); }
+    .plantArt b::before { left: -1px; background: #749e72; transform: rotate(30deg); }
+    .plantArt small { position: absolute; right: 10px; bottom: 8px; color: #486c55; font-family: Georgia, serif; font-size: 18px; }
+    .plantDetails { padding: 12px; }
+    .cardTop { display: flex; align-items: center; justify-content: space-between; color: var(--muted); font-size: 9px; }
+    .deleteButton { display: grid; width: 25px; height: 25px; place-items: center; border: 0; border-radius: 6px; color: var(--muted); background: transparent; }
+    .deleteButton:hover { box-shadow: 0 2px 8px #294b381a; color: var(--accent); }
+    .deleteButton svg { width: 13px; }
+    .plantDetails h3 { margin-top: 1px; font-size: 14px; font-weight: 750; }
+    .species { color: var(--muted); font-family: Georgia, serif; font-size: 10px; font-style: italic; }
+    .careInfo { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 5px; margin-top: 11px; padding: 9px 0; border-top: 1px solid #edf0e8; border-bottom: 1px solid #edf0e8; }
+    .careInfo span { color: var(--muted); font-size: 9px; }
+    .careInfo strong { font-size: 9px; font-weight: 650; text-align: right; }
+    .dueNotice, .okNotice { display: flex; align-items: center; gap: 5px; margin-top: 9px; color: #b36547; font-size: 9px; font-weight: 700; }
+    .okNotice { color: #4b7e5e; }
+    .dueNotice svg, .okNotice svg { width: 13px; }
+    .waterButton { display: flex; width: 100%; min-height: 32px; align-items: center; justify-content: center; gap: 6px; margin-top: 9px; border: 1px solid #cfdfd0; border-radius: 8px; color: #396c4d; background: #f0f7ef; font-size: 10px; font-weight: 700; }
+    .waterButton svg { width: 13px; }
+    .waterButton:hover { box-shadow: 0 3px 9px #47765c20; }
+    .emptyState { grid-column: 1 / -1; padding: 30px; color: var(--muted); font-size: 12px; text-align: center; }
+    .addForm { display: grid; grid-template-columns: 1fr 1.2fr 1.2fr 1fr .85fr 1.1fr auto; align-items: end; gap: 9px; margin-top: 14px; padding: 15px; border: 1px dashed #bfd0c0; border-radius: 14px; background: #f5f8f2; }
+    .formTitle { display: flex; align-items: center; gap: 8px; }
+    .formTitle > span { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; color: #fff; background: #47765c; font-size: 20px; }
+    .formTitle h2 { font-size: 11px; }
+    .formTitle p { color: var(--muted); font-size: 9px; }
+    .addForm label { display: grid; gap: 4px; color: var(--muted); font-size: 9px; font-weight: 700; }
+    .addForm input, .addForm select { width: 100%; min-width: 0; min-height: 34px; padding: 0 7px; border: 1px solid var(--line); border-radius: 7px; outline-color: var(--accent); background: #fff; font-size: 10px; }
+    .addButton { display: flex; min-height: 34px; align-items: center; gap: 5px; padding: 0 9px; border: 0; border-radius: 8px; color: #fff; background: #47765c; font-size: 10px; font-weight: 700; }
+    .addButton svg { width: 13px; }
+    .addButton:hover { box-shadow: 0 3px 10px #47765c30; }
+    .localNote { margin-top: 10px; color: var(--muted); font-size: 10px; text-align: right; }
+    @media (max-width: 1020px) { .plantGrid { grid-template-columns: repeat(2, 1fr); } .addForm { grid-template-columns: repeat(4, 1fr); } .formTitle { grid-column: 1 / -1; } }
+    @media (max-width: 650px) {
+        .gardenHeader { align-items: flex-start; flex-direction: column; }
+        .waterSummary { width: 100%; }
+        .weatherStrip { align-items: flex-start; flex-wrap: wrap; }
+        .weatherStrip span { flex-basis: 100%; }
+        .plantSection { padding: 14px; }
+        .sectionHeading { align-items: stretch; flex-direction: column; }
+        .searchBox { width: 100%; }
+        .toolbar { overflow: auto; }
+        .toolbar button { white-space: nowrap; }
+        .plantGrid { grid-template-columns: 1fr; }
+        .plantArt { height: 145px; }
+        .addForm { grid-template-columns: 1fr 1fr; }
+        .formTitle { grid-column: 1 / -1; }
+        .addForm label:first-of-type { grid-column: 1 / -1; }
+        .addButton { justify-content: center; }
+        .localNote { text-align: left; }
+    }
+}
