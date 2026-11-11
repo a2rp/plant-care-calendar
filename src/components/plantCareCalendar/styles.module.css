@@ -4,6 +4,7 @@
     .gardenHeader h1 { margin-top: 9px; font-family: Georgia, serif; font-size: clamp(44px, 5.2vw, 66px); font-weight: 450; line-height: .96; letter-spacing: -.045em; }
     .gardenHeader h1 span { color: #6f8e78; font-style: italic; }
     .description { margin-top: 13px; color: var(--muted); font-size: 13px; }
+    .storageNotice { margin-bottom: 14px; padding: 10px 12px; border: 1px solid #806b38; border-radius: 9px; color: #f1dfa9; background: #34301f; font-size: 11px; }
     .waterSummary { position: relative; display: flex; min-width: 260px; align-items: center; gap: 13px; padding: 20px; border: 1px solid #cddfcd; border-radius: 17px; background: #dceadd; }
     .waterDrop { width: 48px; height: 48px; display: grid; place-items: center; border-radius: 50% 50% 50% 12px; color: #fff; background: #47765c; font-size: 20px; }
     .waterSummary div { display: grid; line-height: 1.2; }

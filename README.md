@@ -20,11 +20,13 @@ Add a plant and set a rough watering interval. Check Needs water to see plants p
 
 ## Data and limits
 
-Plant records are kept in localStorage in this browser. Watering intervals are estimates only; check the soil and account for plant conditions.
+Plant records are kept in localStorage in this browser and are not synced to other devices. Watering intervals are estimates only; check the soil and account for plant conditions. If browser storage is unavailable or full, changes remain available until the page is closed.
 
 This is a browser-only utility. Clearing the browser’s site data removes its saved information.
 
 ## Run locally
+
+Use Node.js 20.19+ or 22.12+ with npm.
 
 ~~~sh
 npm install

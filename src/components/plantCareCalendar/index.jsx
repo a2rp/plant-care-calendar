@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { FiDroplet, FiPlus, FiSun, FiTrash2 } from "react-icons/fi";
 import ConfirmDialog from "../confirmDialog";
 import styles from "./styles.module.css";
@@ -7,7 +7,10 @@ const storageKey = "little-green-plant-list";
 const dateOffset = (days) => {
     const date = new Date();
     date.setDate(date.getDate() + days);
-    return date.toISOString().slice(0, 10);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
 };
 const starterPlants = [
     { id: 1, name: "Monstera", type: "Monstera deliciosa", room: "Living room", waterEvery: 7, lastWatered: dateOffset(-8), light: "Bright, indirect" },
@@ -15,28 +18,58 @@ const starterPlants = [
     { id: 3, name: "Bird of paradise", type: "Strelitzia", room: "Bedroom", waterEvery: 6, lastWatered: dateOffset(-7), light: "Bright, indirect" },
     { id: 4, name: "Pothos", type: "Epipremnum aureum", room: "Bookshelf", waterEvery: 9, lastWatered: dateOffset(-4), light: "Low to medium" },
 ];
+const isValidDate = (value) => {
+    if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+    const [year, month, day] = value.split("-").map(Number);
+    const date = new Date(year, month - 1, day);
+    return year >= 1000 && date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
+};
+
+const normalizePlants = (value) => {
+    if (!Array.isArray(value)) return null;
+    const plants = value.map((plant) => {
+        if (!plant || typeof plant !== "object" || !(typeof plant.id === "string" || (typeof plant.id === "number" && Number.isFinite(plant.id))) || typeof plant.name !== "string" || !plant.name.trim() || typeof plant.type !== "string" || typeof plant.room !== "string" || !Number.isInteger(plant.waterEvery) || plant.waterEvery < 1 || plant.waterEvery > 3650 || !isValidDate(plant.lastWatered) || typeof plant.light !== "string") return null;
+        return { ...plant, name: plant.name.trim(), type: plant.type.trim(), room: plant.room.trim() };
+    });
+    return plants.every(Boolean) ? plants : null;
+};
+
 const readPlants = () => {
     try {
         const saved = localStorage.getItem(storageKey);
-        return saved ? JSON.parse(saved) : starterPlants;
+        if (saved === null) return { value: starterPlants, notice: "" };
+        const normalized = normalizePlants(JSON.parse(saved));
+        return normalized ? { value: normalized, notice: "" } : { value: starterPlants, notice: "Saved plant records could not be read. You can still use the collection during this visit." };
     } catch {
-        return starterPlants;
+        return { value: starterPlants, notice: "Saved plant records could not be read. You can still use the collection during this visit." };
     }
 };
+const dayNumber = (value) => {
+    const [year, month, day] = value.split("-").map(Number);
+    return Date.UTC(year, month - 1, day) / 86400000;
+};
 const daysUntilWater = (plant) => {
-    const last = new Date(plant.lastWatered + "T12:00:00");
     const today = new Date();
-    today.setHours(12, 0, 0, 0);
-    return plant.waterEvery - Math.floor((today - last) / 86400000);
+    const todayValue = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+    return plant.waterEvery - (dayNumber(todayValue) - dayNumber(plant.lastWatered));
 };
 
 const PlantCareCalendar = () => {
-    const [plants, setPlants] = useState(readPlants);
+    const [savedPlants] = useState(readPlants);
+    const [plants, setPlants] = useState(savedPlants.value);
+    const [storageNotice, setStorageNotice] = useState(savedPlants.notice);
     const [filter, setFilter] = useState("All plants");
     const [query, setQuery] = useState("");
     const [draft, setDraft] = useState({ name: "", type: "", room: "", waterEvery: "7", light: "Bright, indirect" });
     const [pendingDelete, setPendingDelete] = useState(null);
-    useEffect(() => localStorage.setItem(storageKey, JSON.stringify(plants)), [plants]);
+    const persistPlants = (nextPlants) => {
+        try {
+            localStorage.setItem(storageKey, JSON.stringify(nextPlants));
+            setStorageNotice("");
+        } catch {
+            setStorageNotice("Plant records could not be saved in this browser. Changes will reset when you leave this page.");
+        }
+    };
 
     const needsWater = plants.filter((plant) => daysUntilWater(plant) <= 0).length;
     const visiblePlants = useMemo(() => plants.filter((plant) => {
@@ -46,13 +79,22 @@ const PlantCareCalendar = () => {
     }), [plants, filter, query]);
     const addPlant = (event) => {
         event.preventDefault();
-        if (!draft.name.trim()) return;
-        setPlants((current) => [...current, { ...draft, id: Date.now(), name: draft.name.trim(), type: draft.type.trim() || "New plant", room: draft.room.trim() || "Unplaced", waterEvery: Number(draft.waterEvery), lastWatered: dateOffset(0) }]);
+        const waterEvery = Number(draft.waterEvery);
+        if (!draft.name.trim() || !Number.isInteger(waterEvery) || waterEvery < 1 || waterEvery > 3650) return;
+        const nextPlants = [...plants, { ...draft, id: Date.now(), name: draft.name.trim(), type: draft.type.trim() || "New plant", room: draft.room.trim() || "Unplaced", waterEvery, lastWatered: dateOffset(0) }];
+        persistPlants(nextPlants);
+        setPlants(nextPlants);
         setDraft({ name: "", type: "", room: "", waterEvery: "7", light: "Bright, indirect" });
     };
-    const waterPlant = (id) => setPlants((current) => current.map((plant) => plant.id === id ? { ...plant, lastWatered: dateOffset(0) } : plant));
+    const waterPlant = (id) => {
+        const nextPlants = plants.map((plant) => plant.id === id ? { ...plant, lastWatered: dateOffset(0) } : plant);
+        persistPlants(nextPlants);
+        setPlants(nextPlants);
+    };
     const removePlant = () => {
-        setPlants((current) => current.filter((plant) => plant.id !== pendingDelete.id));
+        const nextPlants = plants.filter((plant) => plant.id !== pendingDelete.id);
+        persistPlants(nextPlants);
+        setPlants(nextPlants);
         setPendingDelete(null);
     };
 
@@ -60,12 +102,13 @@ const PlantCareCalendar = () => {
         <section className={styles.plantCareCalendar} id="workspace">
             <div className={styles.gardenHeader}>
                 <div><p className={styles.label}>YOUR INDOOR GARDEN</p><h1>Grow at your<br /><span>own rhythm.</span></h1><p className={styles.description}>A calm little place for your plants and their routines.</p></div>
-                <div className={styles.waterSummary}><span className={styles.waterDrop}><FiDroplet aria-hidden="true" /></span><div><strong>{needsWater}</strong><span>could use a drink</span></div><span className={styles.summaryDate}>THIS WEEK</span></div>
+                <div className={styles.waterSummary}><span className={styles.waterDrop}><FiDroplet aria-hidden="true" /></span><div><strong>{needsWater}</strong><span>could use a drink</span></div><span className={styles.summaryDate}>NEED WATER</span></div>
             </div>
+            {storageNotice && <p className={styles.storageNotice} role="status">{storageNotice}</p>}
             <div className={styles.weatherStrip}><FiSun aria-hidden="true" /><p>Plant note</p><span>Check the soil before watering. Light and room temperature can change how quickly each pot dries.</span></div>
             <section className={styles.plantSection} aria-label="Plant collection">
                 <div className={styles.sectionHeading}><div><h2>Plants at home</h2><p>{plants.length} pots in your collection</p></div><label className={styles.searchBox}><span>Find a plant</span><input value={query} onChange={(event) => setQuery(event.target.value)} aria-label="Search plants" /></label></div>
-                <div className={styles.toolbar} role="group" aria-label="Filter plants">{["All plants", "Needs water", "Doing fine"].map((option) => <button key={option} type="button" className={filter === option ? styles.activeTab : ""} onClick={() => setFilter(option)}>{option}<span>{option === "All plants" ? plants.length : option === "Needs water" ? needsWater : plants.length - needsWater}</span></button>)}</div>
+                <div className={styles.toolbar} role="group" aria-label="Filter plants">{["All plants", "Needs water", "Doing fine"].map((option) => <button key={option} type="button" className={filter === option ? styles.activeTab : ""} aria-pressed={filter === option} onClick={() => setFilter(option)}>{option}<span>{option === "All plants" ? plants.length : option === "Needs water" ? needsWater : plants.length - needsWater}</span></button>)}</div>
                 <div className={styles.plantGrid}>
                     {visiblePlants.map((plant, index) => {
                         const days = daysUntilWater(plant);
@@ -88,7 +131,7 @@ const PlantCareCalendar = () => {
                 <label>Plant name<input required value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} placeholder="e.g. Snake plant" /></label>
                 <label>Species<input value={draft.type} onChange={(event) => setDraft({ ...draft, type: event.target.value })} placeholder="Optional" /></label>
                 <label>Room<input value={draft.room} onChange={(event) => setDraft({ ...draft, room: event.target.value })} placeholder="Where it lives" /></label>
-                <label>Water every<input type="number" min="1" value={draft.waterEvery} onChange={(event) => setDraft({ ...draft, waterEvery: event.target.value })} /></label>
+                <label>Water every<input required type="number" min="1" max="3650" step="1" value={draft.waterEvery} onChange={(event) => setDraft({ ...draft, waterEvery: event.target.value })} /></label>
                 <label>Light<select value={draft.light} onChange={(event) => setDraft({ ...draft, light: event.target.value })}><option>Bright, indirect</option><option>Sunny window</option><option>Low to medium</option><option>Shade</option></select></label>
                 <button type="submit" className={styles.addButton}><FiPlus aria-hidden="true" /> Add plant</button>
             </form>
